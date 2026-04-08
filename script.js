@@ -1,6 +1,7 @@
 /* ============================================
    RAKSHIT GOYAL — PORTFOLIO JS
    Particles · Stats Counter · Scroll Effects
+   Lightbox · Back to Top · Enhanced Animations
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -172,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const revealElements = document.querySelectorAll(
         '.skill-category, .project-card, .achievement-card, .cert-card, ' +
         '.about-text, .info-card, .gallery-item, .timeline-item, .goals-quote, ' +
-        '.contact-card, .section-header'
+        '.contact-card, .section-header, .edu-card, .hobby-card'
     );
 
     revealElements.forEach(el => el.classList.add('reveal'));
@@ -210,7 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // === Stagger animation for grid items ===
-    document.querySelectorAll('.skills-grid, .projects-grid, .achievements-grid, .certs-grid, .gallery-grid, .contact-grid').forEach(grid => {
+    document.querySelectorAll(
+        '.skills-grid, .projects-grid, .achievements-grid, .certs-grid, ' +
+        '.gallery-grid, .contact-grid, .hobbies-grid, .education-timeline'
+    ).forEach(grid => {
         const gridObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -236,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // === Typing effect for hero subtitle (optional enhancement) ===
+    // === Typing effect for hero subtitle ===
     const heroSubtitle = document.querySelector('.hero-subtitle');
     if (heroSubtitle) {
         const text = heroSubtitle.textContent;
@@ -258,5 +262,91 @@ document.addEventListener('DOMContentLoaded', () => {
         // Start typing after initial animations
         setTimeout(typeWriter, 1200);
     }
+
+    // === Image Lightbox ===
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    // All clickable gallery items (both gallery and education images)
+    document.querySelectorAll('.galleryOpen').forEach(item => {
+        item.addEventListener('click', () => {
+            const src = item.dataset.src || item.querySelector('img')?.src;
+            const caption = item.dataset.caption || '';
+            
+            if (src) {
+                lightboxImg.src = src;
+                lightboxCaption.textContent = caption;
+                lightbox.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    });
+
+    function closeLightbox() {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+            lightboxImg.src = '';
+        }, 400);
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) {
+            closeLightbox();
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+            closeLightbox();
+        }
+    });
+
+    // === Back to Top Button ===
+    const backToTop = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 600) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
+    });
+
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // === Parallax effect on hero background grid ===
+    const heroGrid = document.querySelector('.hero-bg-grid');
+    if (heroGrid) {
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            heroGrid.style.transform = `translateY(${scrolled * 0.3}px)`;
+        });
+    }
+
+    // === Tilt effect on hover for project and edu cards ===
+    document.querySelectorAll('.project-card, .edu-card').forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 30;
+            const rotateY = (centerX - x) / 30;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    });
 
 });
